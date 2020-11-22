@@ -43,53 +43,71 @@ void setup() {
   strip.setBrightness(BRIGHTNESS);
 }
 
+#define NUM_STEPS 255 
+
+// given a specific number of minutes, return the number of milliseconds required for one interval
+unsigned long minToIntervalMS(float minutes, unsigned long numSteps)
+{
+  // 60 s/m * 60 ms/s
+  float ms = minutes * 3600.0;
+  unsigned long result = (unsigned long)round(ms) / numSteps;
+}
+
+float hoursToMinutes(float hours) {
+  return hours * 60.0;
+}
+
 void loop() {
 
-    pulseWhite(50);
     //The value in parenthesis is the delay between increments
     // If I make the delay = 3,515 milliseconds I think it would increment 256 times
     // 3,515 * 256 = about 15 minutes (my ballpark of how long I want it to take)
     // Currently that delay value controls the speed of the fade down as well, but I'd like to decouple so fade down could be faster
 
+    // first argument is number of minutes for fade up, and second argument is number of minutes to fade down
+    pulseWhite(15.0, 3.0);
 
-// This green wipe effect I'm just using as a feedback mechanism.
-// I think I could make it serve as a countdown timer
-// If I make the delay between steps = 2,880,00 milliseconds, doing that 30 times (once for each pixel) would give me 24 hours
-// I could adjust that a little to accommodate the time the ~15 minutes the white pulse animation takes.
-// Fill along the length of the strip in various colors...
-//  colorWipe(strip.Color(255,   0,   0)     , 50); // Red
-  colorWipe(strip.Color(  0, 10,   0)     , 1000); // Green  (R,G,B) (delay between pixels)
-//  colorWipe(strip.Color(  0,   0, 255)     , 50); // Blue
-//  colorWipe(strip.Color(  0,   0,   0, 255), 50); // True white (not RGB white)
+    // This green wipe effect I'm just using as a feedback mechanism.
+    // I think I could make it serve as a countdown timer
+    // If I make the delay between steps = 2,880,00 milliseconds, doing that 30 times (once for each pixel) would give me 24 hours
+    // I could adjust that a little to accommodate the time the ~15 minutes the white pulse animation takes.
+    // Fill along the length of the strip in various colors...
+
+    colorWipe(strip.Color(0,10,0), hoursToMinutes(24.0));
 
 }
 
-void pulseWhite(uint8_t wait) {
-  for(int j=0; j<256; j++) { // Ramp up from 0 to 255
+void pulseWhite(float fadeUpMinutes, float fadeDownMinutes) {
+  unsigned long delayms = minToIntervalMS(fadeUpMinutes, NUM_STEPS);
+
+  for(int j=0; j <= NUM_STEPS; j++) { // Ramp up from 0 to 255
     // Fill entire strip with white at gamma-corrected brightness level 'j':
     strip.fill(strip.Color(0, 0, 0, strip.gamma8(j)));
     strip.show();
-    delay(wait);
+    delay(delayms);
   }
 
-  for(int j=255; j>=0; j--) { // Ramp down from 255 to 0
+  delayms = minToIntervalMS(fadeDownMinutes);
+
+  for(int j= NUM_STEPS; j>=0; j--) { // Ramp down from 255 to 0
     strip.fill(strip.Color(0, 0, 0, strip.gamma8(j)));
     strip.show();
     delay(wait);
   }
 }
-
-
 
 // Fill strip pixels one after another with a color. Strip is NOT cleared
 // first; anything there will be covered pixel by pixel. Pass in color
 // (as a single 'packed' 32-bit value, which you can get by calling
 // strip.Color(red, green, blue) as shown in the loop() function above),
 // and a delay time (in milliseconds) between pixels.
-void colorWipe(uint32_t color, int wait) {
+void colorWipe(uint32_t color, float minutes) {
+  
+  unsigned long delayms = minToIntervalMS(minutes, strip.numPixels());
+
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
     strip.show();                          //  Update strip to match
-    delay(wait);                           //  Pause for a moment
+    delay(delayms);                        //  Pause for a moment
   }
 }
