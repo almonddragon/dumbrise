@@ -92,7 +92,7 @@ void pulseWhite(float fadeUpMinutes, float fadeDownMinutes) {
   for(int j= NUM_STEPS; j>=0; j--) { // Ramp down from 255 to 0
     strip.fill(strip.Color(0, 0, 0, strip.gamma8(j)));
     strip.show();
-    delay(wait);
+    delay(delayms);
   }
 }
 
