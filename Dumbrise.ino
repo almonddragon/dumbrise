@@ -45,16 +45,22 @@ void setup() {
 
 #define NUM_STEPS 255 
 
-// given a specific number of minutes, return the number of milliseconds required for one interval
-unsigned long minToIntervalMS(float minutes, unsigned long numSteps)
-{
-  // 60 s/m * 60 ms/s
-  float ms = minutes * 3600.0;
-  unsigned long result = (unsigned long)round(ms) / numSteps;
+unsigned long hoursToMinutes(unsigned long hours) {
+  return hours * 60;
 }
 
-float hoursToMinutes(float hours) {
-  return hours * 60.0;
+unsigned long minutesToSeconds(unsigned long minutes) {
+  return minutes * 60;
+}
+
+unsigned long secondsToMilliseconds(unsigned long minutes) {
+  return minutes * 1000; 
+}
+
+// given a specific number of minutes, return the number of milliseconds required for one interval
+unsigned long minToIntervalMS(unsigned long minutes, unsigned long numSteps)
+{
+  unsigned long result = secondsToMilliseconds(minutesToSeconds(minutes)) / numSteps;
 }
 
 void loop() {
@@ -65,7 +71,7 @@ void loop() {
     // Currently that delay value controls the speed of the fade down as well, but I'd like to decouple so fade down could be faster
 
     // first argument is number of minutes for fade up, and second argument is number of minutes to fade down
-    pulseWhite(15.0, 3.0);
+    pulseWhite(15, 3);
 
     // This green wipe effect I'm just using as a feedback mechanism.
     // I think I could make it serve as a countdown timer
@@ -73,11 +79,11 @@ void loop() {
     // I could adjust that a little to accommodate the time the ~15 minutes the white pulse animation takes.
     // Fill along the length of the strip in various colors...
 
-    colorWipe(strip.Color(0,10,0), hoursToMinutes(24.0));
+    colorWipe(strip.Color(0,10,0), hoursToMinutes(24));
 
 }
 
-void pulseWhite(float fadeUpMinutes, float fadeDownMinutes) {
+void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
   unsigned long delayms = minToIntervalMS(fadeUpMinutes, NUM_STEPS);
 
   for(int j=0; j <= NUM_STEPS; j++) { // Ramp up from 0 to 255
@@ -101,7 +107,7 @@ void pulseWhite(float fadeUpMinutes, float fadeDownMinutes) {
 // (as a single 'packed' 32-bit value, which you can get by calling
 // strip.Color(red, green, blue) as shown in the loop() function above),
 // and a delay time (in milliseconds) between pixels.
-void colorWipe(uint32_t color, float minutes) {
+void colorWipe(uint32_t color, unsigned long minutes) {
   
   unsigned long delayms = minToIntervalMS(minutes, strip.numPixels());
 
