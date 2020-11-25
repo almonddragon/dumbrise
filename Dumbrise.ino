@@ -37,11 +37,11 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 
 void setup() {
-  Serial.begin(9600); //in the tutorials I watched, here in setup is right,but I'm getting error "'serial' was not declared in this scope"?
+  Serial.begin(9600);//I think this is right, but gives error "the selected serial port _ does not exist or your board is not connected"
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();            // Turn OFF all pixels ASAP
   strip.setBrightness(BRIGHTNESS);
-  serial.begin (9600);
+  
 }
 
 #define NUM_STEPS 255 
