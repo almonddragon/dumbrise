@@ -46,16 +46,18 @@ void setup() {
 #define NUM_STEPS 255 
 
 unsigned long hoursToMinutes(unsigned long hours) {
-  return hours * 60;
-}
+  return hours * 60; // This establishes two big variables called "hoursToMinutes" and "hours"? What do the parentheses do here?
+}                     //Where is the initial value for "hours" coming from?
+                      //Do we just not need a value for "hours" the first time the loop runs and we grab it in line 54?
+                      //Since "hours" is going to be a fairly small number, does it need to be "long"
 
 unsigned long minutesToSeconds(unsigned long minutes) {
-  return minutes * 60;
+  return minutes * 60; // this establishes two big variables called "minutesToSeconds" and "minutes"
 }
 
 unsigned long secondsToMilliseconds(unsigned long minutes) {
-  return minutes * 1000; 
-}
+  return minutes * 1000;  // this establishes two big variables called "secondsToMilliseconds" and "minutes"?
+}                         // Are we re-establishing "minutes" here or is something else going on? I expected to see "seconds"
 
 // given a specific number of minutes, return the number of milliseconds required for one interval
 unsigned long minToIntervalMS(unsigned long minutes, unsigned long numSteps)
