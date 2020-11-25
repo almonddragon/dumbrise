@@ -37,13 +37,15 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 
 void setup() {
-
+  Serial.begin(9600); //in the tutorials I watched, here in setup is right,but I'm getting error "'serial' was not declared in this scope"?
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();            // Turn OFF all pixels ASAP
   strip.setBrightness(BRIGHTNESS);
+  serial.begin (9600);
 }
 
 #define NUM_STEPS 255 
+  serial.println(numSteps); //this was just to get a variable printing
 
 unsigned long hoursToMinutes(unsigned long hours) {
   return hours * 60; // This establishes two big variables called "hoursToMinutes" and "hours"? What do the parentheses do here?
@@ -64,6 +66,7 @@ unsigned long minToIntervalMS(unsigned long minutes, unsigned long numSteps)
 {
   unsigned long result = secondsToMilliseconds(minutesToSeconds(minutes)) / numSteps;
 }
+serial.println(numSteps);
 
 void loop() {
 
