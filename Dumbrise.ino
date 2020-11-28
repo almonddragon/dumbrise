@@ -82,6 +82,28 @@ void loop() {
 
 }
 
+float interpolate (float start, float end, float numSteps, float step) {
+  float delta = end - start;
+  return start + ((delta * step)/numSteps);
+}
+
+// given hue, saturation and value starting values, and hue, saturation and value ending values, the number of total steps, and 
+// which step this is, calculate the gamma uncorrected uint32_t pixel color
+// assume H -> 0 ... 360
+//        s -> 0 ... 100
+//        v -> 0 ... 100
+uint32_t hsvInterpolate (uint8_t hueStart, uint8_t hueEnd, uint8_t satStart, uint8_t satEnd, uint8_t vStart, uint8_t vEnd, uint16_t numSteps, uint16_t step) {
+  float h = interpolate((float)hueStart, (float)hueEnd, (float)numSteps, (float)step);
+  float s = interpolate(float)satStart, (float)satEnd, (float) numSteps, (float)step);
+  float v = interpolate(float)vStart, (float)vEnd, (float) numSteps, (float)step);
+  
+  // convert from input range into expected function range.
+  uint16_t effectiveH = (uint16_t)round(h * 65535.0 / 360.0);
+  uint8_t effectiveS = (uint8_t)round(s * 255.0 / 100.0);
+  uint8_t effectiveV = (uint8_t)round(v * 255.0 / 100.0);
+  return strip.ColorHSV(effectiveH, effectiveS, effectiveV);
+}
+
 void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
   unsigned long delayms = minToIntervalMS(fadeUpMinutes, NUM_STEPS);
   // Ideally, color would change as part of this animation.
@@ -89,6 +111,27 @@ void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
   // Saturation would be 100% thoughout
   // Brightness would start at 0 and reach 255 at or near the end of the sequence
   
+  float hueStart = 0;
+  float hueEnd = 60;
+  float sStart = 100;
+  float sEnd = 100;
+  float vStart = 0;
+  float vEnd = 100;
+
+  int hsvNumSteps = 1000;
+  unsigned long hsvDelayMS = minToIntervalMS(fadeUpMinutes, hsvNumSteps);
+
+  for(int j=0; j <= hsvNumSteps; j++) {
+    uint32_t uncorrectedColor = hsvInterpolate(hueStart, hueEnd, sStart, sEnd, vStart, vEnd, hsvNumSteps, j);
+    strip.fill(strip.gamma32(uncorrectedColor));
+    delay(delayms);
+    Serial.print("hsv step:"); Serial.println(j); 
+    Serial.print("hsv value:"); Serial.println(uncorrectedColor, HEX);
+    Serial.print("hsv delay ms:"); Serial.println(hsvDelayMS); 
+  }
+  
+  /*
+
   for(int j=0; j <= NUM_STEPS; j++) { // Ramp up from 0 to 255
     // Fill entire strip with white at gamma-corrected brightness level 'j':
     strip.fill(strip.Color(0, 0, 0, strip.gamma8(j)));
@@ -110,6 +153,7 @@ void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
     Serial.print("fadeDown NUM_STEPS:"); Serial.println(NUM_STEPS); //255
     Serial.print("fadeDown ms:"); Serial.println(delayms); //235 when pulsewhite's fade value is 1 minute
   }
+  */
 }
 
 // Fill strip pixels one after another with a color. Strip is NOT cleared
@@ -126,7 +170,9 @@ void colorWipe(uint32_t color, unsigned long minutes) {
 
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
-    strip.setPixelColor(i-1, (0, 0, 0)); //  Turns off the trailing pixel so the whole strip isn't list up
+    if (i > 0) {
+      strip.setPixelColor(i-1, (0, 0, 0)); //  Turns off the trailing pixel so the whole strip isn't list up
+    }
     strip.show();                          //  Update strip to match
         Serial.print("Countdown i:"); Serial.println(i); //tbd
         Serial.print("Countdown delayms:"); Serial.println(delayms); //tbd
