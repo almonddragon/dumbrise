@@ -77,7 +77,7 @@ void loop() {
     // I could adjust that a little to accommodate the time the ~15 minutes the white pulse animation takes.
     // Fill along the length of the strip in various colors...
 
-    colorWipe(strip.Color(0,10,0), hoursToMinutes(24));
+    colorWipe(strip.Color(10,0,10), hoursToMinutes(24)); //set this "1" back to "24" when done testing
     //Serial.println(hoursToMinutes); //this won't compile "call of overloaded 'println(long unsigned int (&)(longundigned int))' is ambiguous"
 
 }
@@ -89,20 +89,14 @@ void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
   // Saturation would be 100% thoughout
   // Brightness would start at 0 and reach 255 at or near the end of the sequence
   
-    // Serial.println(fadeDownMinutes); //is always 3
-    // Serial.println(fadeUpMinutes); //is always 15
-    // Serial.println(delayms); //It keeps giving me a value of zero...
-    // Serial.println(NUM_STEPS); //is always 255
-
-
   for(int j=0; j <= NUM_STEPS; j++) { // Ramp up from 0 to 255
     // Fill entire strip with white at gamma-corrected brightness level 'j':
     strip.fill(strip.Color(0, 0, 0, strip.gamma8(j)));
     strip.show();
     delay(delayms);
-    // Serial.println(j); //increments from 0 to 255 by +1 really damn fast.
-    // Serial.println(NUM_STEPS); //is always 255
-    // Serial.println(delayms); //is always returning zero
+    Serial.print("fadeUp j:"); Serial.println(j); // increments by 1 on each loop until it hits 255
+    // Serial.print("fadeUp steps:"); Serial.println(NUM_STEPS); // is always 255
+    Serial.print("fadeUp ms:"); Serial.println(delayms); //is 470 when pulsewhite is set to take 2 minutes
 
   }
 
@@ -112,9 +106,9 @@ void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
     strip.fill(strip.Color(0, 0, 0, strip.gamma8(j)));
     strip.show();
     delay(delayms);
-    // Serial.println(j); //decrements from 0 to 255 by -1 really damn fast.
-    // Serial.println(NUM_STEPS); //is always coming back as 255
-    // Serial.println(delayms); //is always coming back as 0 after an inital line of gibberish:
+    Serial.print("fadeDown j:"); Serial.println(j); //decrements by 1 on each loop starting at 255 and stopping at 0
+    Serial.print("fadeDown NUM_STEPS:"); Serial.println(NUM_STEPS); //255
+    Serial.print("fadeDown ms:"); Serial.println(delayms); //235 when pulsewhite's fade value is 1 minute
   }
 }
 
@@ -123,13 +117,19 @@ void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
 // (as a single 'packed' 32-bit value, which you can get by calling
 // strip.Color(red, green, blue) as shown in the loop() function above),
 // and a delay time (in milliseconds) between pixels.
-void colorWipe(uint32_t color, unsigned long minutes) {
+
+// I'd like to reduce the overall brightness of the strip at this point, but not sure how to state setBrightness(50)?
   
+void colorWipe(uint32_t color, unsigned long minutes) {
+
   unsigned long delayms = minToIntervalMS(minutes, strip.numPixels());
 
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
+    strip.setPixelColor(i-1, (0, 0, 0)); //  Turns off the trailing pixel so the whole strip isn't list up
     strip.show();                          //  Update strip to match
+        Serial.print("Countdown i:"); Serial.println(i); //tbd
+        Serial.print("Countdown delayms:"); Serial.println(delayms); //tbd
     delay(delayms);                        //  Pause for a moment
   }
 }
