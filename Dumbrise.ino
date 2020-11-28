@@ -6,9 +6,6 @@
 
 // Here are the current steps:
 // Fade from 0 to full brightness of white channel
-  // Eventually I'd like to change colors over the course of this to be more like a sunrise
-  // Start with low-intensity red, go through yellow and finish as bright as possible
-  // I suspect this would be easier to achieve in an HSV space, but I haven't figured out which library to grab nor how to use it
 // Pause at full brightness for specific count of milliseconds -I haven't figured this out-
 // Fade back down to zero brightness (ideally faster than it does now)
 // Green wipe animation - I'm just using this as a feedback mechansim atm.
@@ -71,11 +68,6 @@ unsigned long minToIntervalMS(unsigned long minutes, unsigned long numSteps)
 
 void loop() {
 
-    //The value in parenthesis is the delay between increments
-    // If I make the delay = 3,515 milliseconds I think it would increment 256 times
-    // 3,515 * 256 = about 15 minutes (my ballpark of how long I want it to take)
-    // Currently that delay value controls the speed of the fade down as well, but I'd like to decouple so fade down could be faster
-
     // first argument is number of minutes for fade up, and second argument is number of minutes to fade down
     pulseWhite(15, 3);
 
@@ -92,6 +84,11 @@ void loop() {
 
 void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
   unsigned long delayms = minToIntervalMS(fadeUpMinutes, NUM_STEPS);
+  // Ideally, color would change as part of this animation.
+  // Hue would start at 0 and stop at 60. It could simply increment by 1 on each step and stop changing once it reaches 60.
+  // Saturation would be 100% thoughout
+  // Brightness would start at 0 and reach 255 at or near the end of the sequence
+  
     // Serial.println(fadeDownMinutes); //is always 3
     // Serial.println(fadeUpMinutes); //is always 15
     // Serial.println(delayms); //It keeps giving me a value of zero...
