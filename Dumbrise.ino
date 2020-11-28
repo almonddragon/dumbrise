@@ -94,8 +94,8 @@ float interpolate (float start, float end, float numSteps, float step) {
 //        v -> 0 ... 100
 uint32_t hsvInterpolate (uint8_t hueStart, uint8_t hueEnd, uint8_t satStart, uint8_t satEnd, uint8_t vStart, uint8_t vEnd, uint16_t numSteps, uint16_t step) {
   float h = interpolate((float)hueStart, (float)hueEnd, (float)numSteps, (float)step);
-  float s = interpolate(float)satStart, (float)satEnd, (float) numSteps, (float)step);
-  float v = interpolate(float)vStart, (float)vEnd, (float) numSteps, (float)step);
+  float s = interpolate((float)satStart, (float)satEnd, (float) numSteps, (float)step);
+  float v = interpolate((float)vStart, (float)vEnd, (float) numSteps, (float)step);
   
   // convert from input range into expected function range.
   uint16_t effectiveH = (uint16_t)round(h * 65535.0 / 360.0);
