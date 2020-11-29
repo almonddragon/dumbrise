@@ -124,6 +124,7 @@ void pulseWhite(unsigned long fadeUpMinutes, unsigned long fadeDownMinutes) {
   for(int j=0; j <= hsvNumSteps; j++) {
     uint32_t uncorrectedColor = hsvInterpolate(hueStart, hueEnd, sStart, sEnd, vStart, vEnd, hsvNumSteps, j);
     strip.fill(strip.gamma32(uncorrectedColor));
+    strip.show();
     delay(delayms);
     Serial.print("hsv step:"); Serial.println(j); 
     Serial.print("hsv value:"); Serial.println(uncorrectedColor, HEX);
